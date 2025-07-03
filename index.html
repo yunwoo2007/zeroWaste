@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>앱 실행 중...</title>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id") || "default";
+    let isHidden = false;
+
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) {
+        isHidden = true;
+      }
+    });
+
+    window.addEventListener("pagehide", function () {
+      isHidden = true;
+    });
+
+    function openApp() {
+      const now = Date.now();
+
+      // 앱 실행 시도
+      window.location.href = `zerowaste://detail?id=${id}`;
+
+      // fallback
+      setTimeout(function () {
+        const elapsed = Date.now() - now;
+
+        // 앱이 정상적으로 실행되어 백그라운드로 가면 isHidden이 true가 됨
+        if (!isHidden && elapsed < 3000) {
+          const ua = navigator.userAgent;
+
+          if (/android/i.test(ua)) {
+            window.location.href = "https://play.google.com/store/apps/details?id=com.darinkim.emotion_diary";
+          } else if (/iphone|ipad|ipod/i.test(ua)) {
+            window.location.href = "https://apps.apple.com/us/app/onion-diary/id6743059607";
+          } else {
+            alert("이 기기는 앱을 지원하지 않습니다.");
+          }
+        }
+      }, 1500);
+    }
+  </script>
+</head>
+<body onload="openApp()">
+  <p>앱을 여는 중입니다...</p>
+</body>
+</html>
